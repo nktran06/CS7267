@@ -36,7 +36,6 @@ class KNN:
         for test_point in self.x_test:
             dist_array = []
 
-
             for train_point in self.x_train:
                 distance = self.distance_calculation(test_point, train_point)
                 dist_array.append(distance)
@@ -54,7 +53,7 @@ class KNN:
     def test_accuracy(self, y_predict, y_test):
         true_positives = 0
         true_negatives = 0
-        false_positives =0
+        false_positives = 0
         false_negatives = 0
 
         for i in range(len(y_test)):
@@ -72,21 +71,29 @@ class KNN:
         print("Total samples: ", len(y_test))
         print("This is the confusion matrix: \nTrue Positives: ",
               true_positives, "\nTrue Negatives: ", true_negatives,
-              "\nFalse Positives: " , false_positives, "\nFalse Negatives: ",
+              "\nFalse Positives: ", false_positives, "\nFalse Negatives: ",
               false_negatives, "\n Accuracy: ",
-              float((true_negatives+true_positives)/len(y_test)))
+              float((true_negatives + true_positives) / len(y_test)))
 
 
 def prepare_dataset():
     # loads in data set randomly assigns 70 percent of the data set to the
     # training group and assigns the other 30% of the file to the test group
     X = pd.read_csv('wdbc.data.mb.csv')
-    LengthOfList = len(X)
+
     # First randomize the dataframe
-    X = X.sample(frac = 1)
+    X = X.sample(frac=1)
+
+    # Corrects null or zero values
+    for i in range(len(X)):
+        for j in range(len(X[i])):
+            if X[i][j].isnull or X[i][j] == 0:
+                X[i][j] = X.mean(axis=0, skipna=True, numeric_only=True)
+
     # seperate the class column
     classvalue = X.iloc[:, -1:]
     X = X.iloc[:, :-2]
+
     X = (X - X.mean()) / X.std()
     X = X.to_numpy()
     classvalue = classvalue.to_numpy()
