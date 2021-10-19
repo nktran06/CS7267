@@ -5,7 +5,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
 
 def importdata():
-    data = pd.read_csv('portland_housing_trimmed.csv.csv')
+    data = pd.read_csv('portland_housing_trimmed.csv')
     return data
 
 def dataDrop(data):
