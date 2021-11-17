@@ -22,7 +22,7 @@ df['bathrooms scl']=scaler.fit_transform(df[['bathrooms']])
 df['bedrooms scl']=scaler.fit_transform(df[['bedrooms']])
 df['daysListed scl']=scaler.fit_transform(df[['daysOnZillow']])
 
-df_train, df_test = train_test_split(df, test_size=0.25, random_state=5)
+df_train, df_test = train_test_split(df, test_size=0.25, random_state=41)
 X_train=df_train[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl', 'daysListed scl']]
 X_test=df_test[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl', 'daysListed scl']]
 Y_train=df_train['zestimate'].ravel()
