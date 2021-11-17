@@ -1,12 +1,13 @@
 import pandas as pd
+import numpy as np
+import sklearn
+from sklearn.metrics import mean_squared_error
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import OrdinalEncoder
 from sklearn.neighbors import KNeighborsRegressor
 
 df = pd.read_csv('portland_housing.csv', encoding='utf-8')
-df.dropna(subset = ["zestimate", "latitude", "longitude", "yearBuilt", "livingArea (sqft)", "lotSize", "bathrooms", "bedrooms"], inplace=True)
-df['Price Bracket'] = pd.qcut(df['zestimate'], 3, labels=['bottom 33', 'middle 33', 'top 33'])
+df.dropna(subset = ["zestimate", "latitude", "longitude", "yearBuilt", "livingArea (sqft)", "lotSize", "bathrooms", "bedrooms", "daysOnZillow"], inplace=True)
 def age(x):
     return float(2021-x)
 df['age'] = df['yearBuilt'].apply(age)
@@ -19,26 +20,35 @@ df['livingArea scl']=scaler.fit_transform(df[['livingArea (sqft)']])
 df['lotSize scl']=scaler.fit_transform(df[['lotSize']])
 df['bathrooms scl']=scaler.fit_transform(df[['bathrooms']])
 df['bedrooms scl']=scaler.fit_transform(df[['bedrooms']])
-enc=OrdinalEncoder()
-df['Price Bracket enc']=enc.fit_transform(df[['Price Bracket']]) # encode categorical values
+df['daysListed scl']=scaler.fit_transform(df[['daysOnZillow']])
 
-df_train, df_test = train_test_split(df, test_size=0.2, random_state=42)
-X_train=df_train[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl']]
-X_test=df_test[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl']]
-y_train=df_train['zestimate'].ravel()
-y_test=df_test['zestimate'].ravel()
+df_train, df_test = train_test_split(df, test_size=0.25, random_state=5)
+X_train=df_train[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl', 'daysListed scl']]
+X_test=df_test[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl', 'daysListed scl']]
+Y_train=df_train['zestimate'].ravel()
+Y_test=df_test['zestimate'].ravel()
 
 model = KNeighborsRegressor(n_neighbors=3, weights='uniform', algorithm='auto', p=2, n_jobs=-1)
 
-reg = model.fit(X_train, y_train)
+reg = model.fit(X_train, Y_train)
 pred_values_train = model.predict(X_train)
 pred_values_test = model.predict(X_test)
 
-print(df)
+print(pd.DataFrame(Y_test))
+print(pd.DataFrame(pred_values_test))
+print(pd.DataFrame(Y_train))
+print(pd.DataFrame(pred_values_train))
+
+pd.set_option("display.width", 400)
+pd.set_option("display.max_columns", 20)
 print('---------------------------------------------------------')
-print('Number of Samples Fit: ', reg.n_samples_fit_)
-score_test = model.score(X_test, y_test)
-print('Test Accuracy Score: ', score_test)
-score_train = model.score(X_train, y_train)
-print('Training Accuracy Score: ', score_train)
+print('Effective Metric: \t\t\t', reg.effective_metric_)
+print('Effective Metric Params: \t', reg.effective_metric_params_)
+print('No. of Samples Fit: \t\t', reg.n_samples_fit_)
+print("")
+print('Test r2 Squared Score: \t\t', sklearn.metrics.r2_score(Y_test, pred_values_test))
+print("Test Mean Squared Error: \t", mean_squared_error(Y_test, pred_values_test))
+print("")
+print('Train r2 Squared Score: \t', sklearn.metrics.r2_score(Y_train, pred_values_train))
+print("Train Mean Squared Error: \t", mean_squared_error(Y_train, pred_values_train))
 print('---------------------------------------------------------')
