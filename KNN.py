@@ -21,12 +21,13 @@ df['bathrooms scl']=scaler.fit_transform(df[['bathrooms']])
 df['bedrooms scl']=scaler.fit_transform(df[['bedrooms']])
 df['daysListed scl']=scaler.fit_transform(df[['daysOnZillow']])
 df['soldPrice scl']=scaler.fit_transform(df[['lastSoldPrice']])
+df['zestimate scl']=scaler.fit_transform(df[['zestimate']])
 
 df_train, df_test = sklearn.model_selection.train_test_split(df, test_size=0.20, random_state=41)
 X_train=df_train[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl', 'daysListed scl', 'soldPrice scl']]
 X_test=df_test[['latitude scl', 'longitude scl', 'house age scl', 'livingArea scl', 'lotSize scl', 'bathrooms scl', 'bedrooms scl', 'daysListed scl', 'soldPrice scl']]
-Y_train=df_train['zestimate'].ravel()
-Y_test=df_test['zestimate'].ravel()
+Y_train=df_train['zestimate scl'].ravel()
+Y_test=df_test['zestimate scl'].ravel()
 
 model = sklearn.neighbors.KNeighborsRegressor(n_neighbors=9, weights='distance', algorithm='auto', p=2, n_jobs=-1)
 
